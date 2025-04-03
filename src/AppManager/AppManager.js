@@ -21,10 +21,10 @@ export default function AppManager() {
   const viewGame = <TieKnotsOfAdmiralsStack />;
 
   const appManagerStack = () => (
-    <AppManagerStack
-      dataLoad={dataLoad.current}
-      userAgent={userAgent.current}
-    />
+      <AppManagerStack
+          dataLoad={dataLoad.current}
+          userAgent={userAgent.current}
+      />
   );
 
   const [isLoadingScreen, setLoadingScreen] = useState(true);
@@ -60,11 +60,11 @@ export default function AppManager() {
   // робимо запит на відстеження
   async function getAdID() {
     ReactNativeIdfaAaid.getAdvertisingInfoAndCheckAuthorization(true).then(
-      res => {
-        // обробляємо клік в алерт
-        adID.current = res.id ? res.id : '00000000-0000-0000-0000-000000000000'; // отримуємо advertising id
-        initAppManager();
-      },
+        res => {
+          // обробляємо клік в алерт
+          adID.current = res.id ? res.id : '00000000-0000-0000-0000-000000000000'; // отримуємо advertising id
+          initAppManager();
+        },
     );
   }
 
@@ -96,32 +96,32 @@ export default function AppManager() {
   }
 
   const onInstallConversionDataCanceller = appsFlyer.onInstallConversionData(
-    res => {
-      try {
-        if (JSON.parse(res.data.is_first_launch) === true) {
-          if (res.data.af_status === 'Non-organic') {
-            if (res.data.campaign.toString().includes('_')) {
-              subsRef.current = res.data.campaign;
-            } else {
-              subsRef.current = '';
+      res => {
+        try {
+          if (JSON.parse(res.data.is_first_launch) === true) {
+            if (res.data.af_status === 'Non-organic') {
+              if (res.data.campaign.toString().includes('_')) {
+                subsRef.current = res.data.campaign;
+              } else {
+                subsRef.current = '';
+              }
+              appendParams.current = JSON.stringify(res);
             }
-            appendParams.current = JSON.stringify(res);
+            generateFinish();
           }
-          generateFinish();
+        } catch (err) {
+          console.log(err);
+          loadGame();
         }
-      } catch (err) {
-        console.log(err);
-        loadGame();
-      }
-    },
+      },
   );
 
   async function getAsaAttribution() {
     try {
       const adServicesAttributionData = JSON.parse(
-        JSON.stringify(
-          await AppleAdsAttributionInstance.getAdServicesAttributionData(),
-        ),
+          JSON.stringify(
+              await AppleAdsAttributionInstance.getAdServicesAttributionData(),
+          ),
       );
       if (adServicesAttributionData.attribution === true) {
         appendParams.current = JSON.stringify(adServicesAttributionData);
@@ -139,16 +139,16 @@ export default function AppManager() {
     OneSignal.User.getOnesignalId().then(res => {
       onesignalID.current = res;
       dataLoad.current =
-        Params.bodyLin +
-        `?${Params.bodyLin.split('space/')[1]}=1&appsID=${
-          appsID.current
-        }&adID=${adID.current}&onesignalID=${onesignalID.current}&deviceID=${
-          deviceID.current
-        }&userID=${deviceID.current}${generateSubs()}${
-          appendParams.current ? `&info=${appendParams.current}` : ''
-        }` +
-        '&timestamp=' +
-        userID.current;
+          Params.bodyLin +
+          `?${Params.bodyLin.split('space/')[1]}=1&appsID=${
+              appsID.current
+          }&adID=${adID.current}&onesignalID=${onesignalID.current}&deviceID=${
+              deviceID.current
+          }&userID=${deviceID.current}${generateSubs()}${
+              appendParams.current ? `&info=${appendParams.current}` : ''
+          }` +
+          '&timestamp=' +
+          userID.current;
       Storage.save('link', dataLoad.current);
       openAppManagerView(true, false);
     });
@@ -172,8 +172,8 @@ export default function AppManager() {
       return '';
     }
     const subParams = subList
-      .map((sub, index) => `sub_id_${index + 1}=${sub}`)
-      .join('&');
+        .map((sub, index) => `sub_id_${index + 1}=${sub}`)
+        .join('&');
 
     return `&${subParams}`;
   }
@@ -250,14 +250,14 @@ export default function AppManager() {
             dataLoad.current = res + '&push=true';
             if (linkOpenInBrowser) {
               EventManager.sendEvent(
-                userID.current,
-                EventManager.eventList.browser,
+                  userID.current,
+                  EventManager.eventList.browser,
               );
               Linking.openURL(linkOpenInBrowser);
             } else {
               EventManager.sendEvent(
-                userID.current,
-                EventManager.eventList.web_push,
+                  userID.current,
+                  EventManager.eventList.web_push,
               );
             }
             openAppManagerView(false);
@@ -269,7 +269,7 @@ export default function AppManager() {
           try {
             deviceID.current = await Device.getUniqueId();
             userAgent.current =
-              (await Device.getUserAgent()) + '  Safari/604.1';
+                (await Device.getUserAgent()) + '  Safari/604.1';
             console.log(userAgent);
             getAdID();
           } catch (_) {}
@@ -286,10 +286,10 @@ export default function AppManager() {
 
   const getView = () => {
     return isLoadingScreen
-      ? viewLoader
-      : isGameOpen
-      ? viewGame
-      : appManagerStack();
+        ? viewLoader
+        : isGameOpen
+            ? viewGame
+            : appManagerStack();
   };
 
   return getView();
